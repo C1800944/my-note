@@ -154,3 +154,29 @@ git push --force origin main
 - **团队沟通**：推送前通知协作者
 
 > 记住：推送前总是运行 `git status` 检查更改，`git log --oneline` 查看提交历史。
+
+---
+
+## 七、问答环节
+
+### Q1: `git push` 和 `git pull` 有什么区别？
+- A1: `git push` 是把本地提交上传到远程仓库；`git pull` 是从远程仓库拉取更新并合并到本地。
+
+### Q2: 为什么会出现“没有上游分支”的错误？
+- A2: 因为当前分支没有设置远程分支关联，第一次推送新分支时需要使用 `git push -u origin <branch>`。
+
+### Q3: 什么时候应该使用 `--force-with-lease` 而不是 `--force`？
+- A3: 当你需要覆盖远程分支但又不想意外覆盖别人最新提交时，`--force-with-lease` 更安全。
+
+### Q4: 如果远程仓库提示更新被拒绝，应该怎样处理？
+- A4: 先用 `git pull origin <branch>` 或 `git pull --rebase origin <branch>` 获取远程更新，解决冲突后再重新推送。
+
+### Q5: 推送前应该检查哪些命令？
+- A5: 主要检查 `git status`、`git diff --staged`、`git log --oneline`，确认改动和提交信息正确。
+
+### Q6: `git push --tags` 什么时候用？
+- A6: 当你需要将本地标签同步到远程仓库，例如发布版本时，使用 `git push --tags origin`。
+
+### Q7: 推送新分支时为什么要设置上游分支？
+- A7: 设置上游分支后，后续只需要 `git push`/`git pull` 即可自动和远程对应分支同步，操作更方便。
+
