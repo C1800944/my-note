@@ -1,0 +1,140 @@
+{
+  "source": "澎湃新闻24h热榜",
+  "target_url": "https://m.thepaper.cn/htmlstatic",
+  "fetch_time": "2026-06-17 09:28:53",
+  "total_count": 22,
+  "data": [
+    {
+      "title": "要闻",
+      "rank": 1,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "深度",
+      "rank": 2,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "直播",
+      "rank": 3,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "视频",
+      "rank": 4,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "时事",
+      "rank": 5,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "国际",
+      "rank": 6,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "财经",
+      "rank": 7,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "视听",
+      "rank": 8,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "科技",
+      "rank": 9,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "暖闻",
+      "rank": 10,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "澎湃号",
+      "rank": 11,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "智库",
+      "rank": 12,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "思想",
+      "rank": 13,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "生活",
+      "rank": 14,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "问吧",
+      "rank": 15,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "奔流",
+      "rank": 16,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "健康",
+      "rank": 17,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "体育",
+      "rank": 18,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "评论",
+      "rank": 19,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "ESG",
+      "rank": 20,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "文旅",
+      "rank": 21,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    },
+    {
+      "title": "短剧",
+      "rank": 22,
+      "hot_value": 0,
+      "publish_time": "2026-06-17 09:28:53"
+    }
+  ]
+}

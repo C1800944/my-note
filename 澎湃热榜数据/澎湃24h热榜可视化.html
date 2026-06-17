@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>澎湃新闻24h热榜可视化</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0e17;
+  color: #e0e6f0;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* 标题区域 */
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.header .sub {
+  font-size: 14px;
+  color: #7a8ba8;
+}
+.header .hot-icon {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #ff6b35, #ff2d2d);
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 10px;
+  position: relative;
+}
+.header .hot-icon::after {
+  content: "🔥";
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 统计卡片 */
+.stats-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 36px;
+  justify-content: center;
+}
+.stat-card {
+  background: linear-gradient(145deg, #141b2d, #1a2440);
+  border: 1px solid #2a3555;
+  border-radius: 12px;
+  padding: 18px 24px;
+  text-align: center;
+  flex: 1;
+  max-width: 200px;
+}
+.stat-card .num {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ff6b35;
+}
+.stat-card .label {
+  font-size: 12px;
+  color: #7a8ba8;
+  margin-top: 4px;
+}
+
+/* 横向条形图 */
+.bar-section {
+  margin-bottom: 40px;
+}
+.bar-section h2 {
+  font-size: 18px;
+  color: #c0cee0;
+  margin-bottom: 20px;
+  padding-left: 12px;
+  border-left: 3px solid #ff6b35;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  background: #141b2d;
+  border-radius: 10px;
+  border: 1px solid #1e2a42;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+.bar-row:hover {
+  background: #1a2440;
+  border-color: #ff6b35;
+  transform: translateX(4px);
+}
+
+.bar-rank {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+.bar-rank.top1 { background: linear-gradient(135deg, #ff2d2d, #ff6b35); color: #fff; }
+.bar-rank.top2 { background: linear-gradient(135deg, #ff6b35, #ffa540); color: #fff; }
+.bar-rank.top3 { background: linear-gradient(135deg, #ffa540, #ffc840); color: #1a1a1a; }
+.bar-rank.normal { background: #1e2a42; color: #7a8ba8; }
+
+.bar-info {
+  flex: 1;
+  min-width: 0;
+}
+.bar-title {
+  font-size: 15px;
+  color: #e0e6f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+.bar-title a {
+  color: #e0e6f0;
+  text-decoration: none;
+}
+.bar-title a:hover {
+  color: #ff6b35;
+}
+
+.bar-track {
+  height: 8px;
+  background: #1e2a42;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #ff6b35, #ffa540);
+  transition: width 1s ease;
+  position: relative;
+}
+.bar-fill::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 30px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+  border-radius: 4px;
+}
+
+.bar-hot {
+  width: 70px;
+  text-align: right;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ff6b35;
+  flex-shrink: 0;
+  margin-left: 14px;
+}
+
+/* 热度分布饼图 */
+.pie-section {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+.pie-section h2 {
+  font-size: 18px;
+  color: #c0cee0;
+  margin-bottom: 20px;
+  padding-left: 12px;
+  border-left: 3px solid #ffa540;
+}
+
+.pie-chart-wrapper {
+  flex: 0 0 260px;
+  text-align: center;
+}
+.pie-legend {
+  flex: 1;
+}
+
+.pie-ring {
+  width: 220px;
+  height: 220px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 8px 14px;
+  background: #141b2d;
+  border-radius: 8px;
+}
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  margin-right: 10px;
+}
+.legend-label { font-size: 14px; color: #c0cee0; }
+.legend-val { font-size: 14px; color: #7a8ba8; margin-left: auto; }
+
+/* 分类标签云 */
+.tag-section {
+  margin-bottom: 40px;
+}
+.tag-section h2 {
+  font-size: 18px;
+  color: #c0cee0;
+  margin-bottom: 20px;
+  padding-left: 12px;
+  border-left: 3px solid #3b82f6;
+}
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.tag-item {
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  background: #1a2440;
+  border: 1px solid #2a3555;
+  color: #c0cee0;
+  transition: all 0.3s;
+}
+.tag-item:hover {
+  background: #ff6b35;
+  color: #fff;
+  border-color: #ff6b35;
+}
+.tag-item.sport { background: #1a3a2d; border-color: #2d5a42; color: #5ae080; }
+.tag-item.politics { background: #2d1a3a; border-color: #5a2d6a; color: #c080ff; }
+.tag-item.social { background: #3a2d1a; border-color: #6a5a2d; color: #ffc040; }
+.tag-item.business { background: #1a2d3a; border-color: #2d5a6a; color: #40c0e0; }
+
+/* 底部信息 */
+.footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: #5a6a80;
+  border-top: 1px solid #1e2a42;
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.bar-row { animation: fadeInUp 0.5s ease both; }
+.bar-row:nth-child(1) { animation-delay: 0.05s; }
+.bar-row:nth-child(2) { animation-delay: 0.1s; }
+.bar-row:nth-child(3) { animation-delay: 0.15s; }
+.bar-row:nth-child(4) { animation-delay: 0.2s; }
+.bar-row:nth-child(5) { animation-delay: 0.25s; }
+.bar-row:nth-child(6) { animation-delay: 0.3s; }
+.bar-row:nth-child(7) { animation-delay: 0.35s; }
+.bar-row:nth-child(8) { animation-delay: 0.4s; }
+.bar-row:nth-child(9) { animation-delay: 0.45s; }
+.bar-row:nth-child(10) { animation-delay: 0.5s; }
+.bar-row:nth-child(11) { animation-delay: 0.55s; }
+.bar-row:nth-child(12) { animation-delay: 0.6s; }
+.bar-row:nth-child(13) { animation-delay: 0.65s; }
+.bar-row:nth-child(14) { animation-delay: 0.7s; }
+.bar-row:nth-child(15) { animation-delay: 0.75s; }
+.bar-row:nth-child(16) { animation-delay: 0.8s; }
+.bar-row:nth-child(17) { animation-delay: 0.85s; }
+.bar-row:nth-child(18) { animation-delay: 0.9s; }
+.bar-row:nth-child(19) { animation-delay: 0.95s; }
+.bar-row:nth-child(20) { animation-delay: 1.0s; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 标题 -->
+  <div class="header">
+    <div style="display:inline-flex;align-items:center;justify-content:center;">
+      <span class="hot-icon"></span>
+      <h1>澎湃新闻 · 24h热榜</h1>
+    </div>
+    <div class="sub">数据来源：thepaper.cn | 抓取时间：2026-06-17 | 共20条热榜新闻</div>
+  </div>
+
+  <!-- 统计卡片 -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="num" id="stat-total">20</div>
+      <div class="label">热榜条目</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-max">476</div>
+      <div class="label">最高热度</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-avg">194</div>
+      <div class="label">平均热度</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-over200">10</div>
+      <div class="label">热度≥200</div>
+    </div>
+  </div>
+
+  <!-- 热度排行条形图 -->
+  <div class="bar-section">
+    <h2>热度排行 TOP 20</h2>
+    <div id="bar-chart"></div>
+  </div>
+
+  <!-- 热度分布 -->
+  <div class="pie-section">
+    <div>
+      <h2>热度区间分布</h2>
+      <div class="pie-chart-wrapper">
+        <canvas id="pie-canvas" width="220" height="220"></canvas>
+      </div>
+    </div>
+    <div style="flex:1;">
+      <h2>分布详情</h2>
+      <div id="pie-legend" class="pie-legend"></div>
+    </div>
+  </div>
+
+  <!-- 分类标签云 -->
+  <div class="tag-section">
+    <h2>内容分类标签</h2>
+    <div class="tag-cloud" id="tag-cloud"></div>
+  </div>
+
+  <!-- 底部 -->
+  <div class="footer">
+    澎湃新闻24h热榜可视化 | 数据仅供学习研究使用 | 目标网页：https://m.thepaper.cn/htmlstatic
+  </div>
+
+</div>
+
+<script>
+// ==================== 热榜数据 ====================
+const HOT_DATA = [
+  {"id":"33389989","title":"刚完赛就被勒令离开美国！伊朗队主帅抱怨球队在世界杯受压迫","hot":476,"url":"https://www.thepaper.cn/newsDetail_forward_33389989"},
+  {"id":"33388365","title":"特朗普大发雷霆后，内塔尼亚胡回应：以军不撤","hot":383,"url":"https://www.thepaper.cn/newsDetail_forward_33388365"},
+  {"id":"33392654","title":"\u201c成都27岁女子遇害案\u201d二审维持原判：梁某滢死缓","hot":341,"url":"https://www.thepaper.cn/newsDetail_forward_33392654"},
+  {"id":"33389595","title":"lululemon向公众及朱一龙道歉：未能在前期充分识别潜在争议","hot":312,"url":"https://www.thepaper.cn/newsDetail_forward_33389595"},
+  {"id":"33388905","title":"黑龙江省纪委副书记、省监委副主任姜宏伟任上被查","hot":308,"url":"https://www.thepaper.cn/newsDetail_forward_33388905"},
+  {"id":"33389739","title":"上海链家通报调查细节：未吃差价！已主动联系主管部门指导","hot":287,"url":"https://www.thepaper.cn/newsDetail_forward_33389739"},
+  {"id":"33391629","title":"梅西第200场倒计时，阿根廷开始一个国家的告别","hot":282,"url":"https://www.thepaper.cn/newsDetail_forward_33391629"},
+  {"id":"33388299","title":"伊朗2比2新西兰，本届世界杯\u201c亚洲球队\u201d保持不败","hot":273,"url":"https://www.thepaper.cn/newsDetail_forward_33388299"},
+  {"id":"33389751","title":"新任国防部新闻发言人陈曦亮相","hot":270,"url":"https://www.thepaper.cn/newsDetail_forward_33389751"},
+  {"id":"33389730","title":"欧盟指控中方\u201c训练俄军事人员在乌作战\u201d，外交部：污蔑抹黑","hot":199,"url":"https://www.thepaper.cn/newsDetail_forward_33389730"},
+  {"id":"33390389","title":"山姆中国更换董事长：会员店业态总裁刘鹏接任，去年10月刚加入","hot":196,"url":"https://www.thepaper.cn/newsDetail_forward_33390389"},
+  {"id":"33388524","title":"成都\u201c27岁王紫雅遇害案\u201d二审上午开庭：遇害处是家门口还是室内仍为焦点","hot":181,"url":"https://www.thepaper.cn/newsDetail_forward_33388524"},
+  {"id":"33390393","title":"特朗普称美伊协议谈判进入第二阶段","hot":163,"url":"https://www.thepaper.cn/newsDetail_forward_33390393"},
+  {"id":"33388401","title":"深观察｜办好人民满意的教育：从\u201c有学上\u201d到\u201c上好学\u201d","hot":148,"url":"https://www.thepaper.cn/newsDetail_forward_33388401"},
+  {"id":"33389618","title":"伊朗队主帅：球队突然被勒令立即离开美国，此前获准在美过夜","hot":113,"url":"https://www.thepaper.cn/newsDetail_forward_33389618"},
+  {"id":"33391631","title":"青海海西州地震已致1人遇难、4人受伤","hot":87,"url":"https://www.thepaper.cn/newsDetail_forward_33391631"},
+  {"id":"33391626","title":"马上评｜在影院看世界杯，解锁的不只是看球新体验","hot":86,"url":"https://www.thepaper.cn/newsDetail_forward_33391626"},
+  {"id":"33389177","title":"观察｜美以伊战争结束的开始：相互止损同步履约，走一步看一步","hot":80,"url":"https://www.thepaper.cn/newsDetail_forward_33389177"},
+  {"id":"33390820","title":"江苏省副省长陈忠伟任江苏省委常委","hot":74,"url":"https://www.thepaper.cn/newsDetail_forward_33390820"},
+  {"id":"33387955","title":"\u201c成都27岁女子遇害案\u201d二审今日开庭","hot":30,"url":"https://www.thepaper.cn/newsDetail_forward_33387955"}
+];
+
+// ==================== 条形图渲染 ====================
+const maxHot = Math.max(...HOT_DATA.map(d => d.hot));
+const avgHot = Math.round(HOT_DATA.reduce((s,d) => s + d.hot, 0) / HOT_DATA.length);
+const over200 = HOT_DATA.filter(d => d.hot >= 200).length;
+
+document.getElementById('stat-max').textContent = maxHot;
+document.getElementById('stat-avg').textContent = avgHot;
+document.getElementById('stat-over200').textContent = over200;
+
+const barChart = document.getElementById('bar-chart');
+HOT_DATA.forEach((item, i) => {
+  const rank = i + 1;
+  const pct = (item.hot / maxHot * 100).toFixed(1);
+  const rankClass = rank <= 1 ? 'top1' : rank <= 2 ? 'top2' : rank <= 3 ? 'top3' : 'normal';
+
+  const row = document.createElement('div');
+  row.className = 'bar-row';
+  row.innerHTML = `
+    <div class="bar-rank ${rankClass}">${rank}</div>
+    <div class="bar-info">
+      <div class="bar-title"><a href="${item.url}" target="_blank">${item.title}</a></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="bar-hot">${item.hot}</div>
+  `;
+  barChart.appendChild(row);
+});
+
+// ==================== 热度分布饼图 ====================
+const ranges = [
+  { label: '400+ 极热', min: 400, color: '#ff2d2d' },
+  { label: '200-399 高热', min: 200, max: 399, color: '#ff6b35' },
+  { label: '100-199 中热', min: 100, max: 199, color: '#ffa540' },
+  { label: '50-99 低热', min: 50, max: 99, color: '#3b82f6' },
+  { label: '<50 微热', min: 0, max: 49, color: '#7a8ba8' },
+];
+
+const rangeCounts = ranges.map(r => {
+  return HOT_DATA.filter(d => {
+    if (r.max) return d.hot >= r.min && d.hot <= r.max;
+    return d.hot >= r.min;
+  }).length;
+});
+
+// 绘制环形图
+const canvas = document.getElementById('pie-canvas');
+const ctx = canvas.getContext('2d');
+const cx = 110, cy = 110, outerR = 95, innerR = 55;
+const total = rangeCounts.reduce((a,b) => a + b, 0);
+let startAngle = -Math.PI / 2;
+
+rangeCounts.forEach((count, i) => {
+  if (count === 0) return;
+  const sliceAngle = (count / total) * 2 * Math.PI;
+  ctx.beginPath();
+  ctx.arc(cx, cy, outerR, startAngle, startAngle + sliceAngle);
+  ctx.arc(cx, cy, innerR, startAngle + sliceAngle, startAngle, true);
+  ctx.closePath();
+  ctx.fillStyle = ranges[i].color;
+  ctx.fill();
+  startAngle += sliceAngle;
+});
+
+// 中心文字
+ctx.fillStyle = '#e0e6f0';
+ctx.font = 'bold 24px "Microsoft YaHei"';
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+ctx.fillText('20', cx, cy - 8);
+ctx.font = '12px "Microsoft YaHei"';
+ctx.fillStyle = '#7a8ba8';
+ctx.fillText('热榜条目', cx, cy + 14);
+
+// 图例
+const legendEl = document.getElementById('pie-legend');
+ranges.forEach((r, i) => {
+  const pct = (rangeCounts[i] / total * 100).toFixed(0);
+  const div = document.createElement('div');
+  div.className = 'legend-item';
+  div.innerHTML = `
+    <div class="legend-color" style="background:${r.color}"></div>
+    <div class="legend-label">${r.label}</div>
+    <div class="legend-val">${rangeCounts[i]}条 (${pct}%)</div>
+  `;
+  legendEl.appendChild(div);
+});
+
+// ==================== 分类标签云 ====================
+const categories = [
+  { label: '世界杯/体育', cls: 'sport', items: ['伊朗队世界杯受压迫', '伊朗2比2新西兰', '梅西200场倒计时', '影院看世界杯'] },
+  { label: '国际政治', cls: 'politics', items: ['内塔尼亚胡回应', '美伊协议谈判', '欧盟指控中方', '美以伊战争观察'] },
+  { label: '社会法治', cls: 'social', items: ['成都女子遇害案', '姜宏伟被查', '青海地震'] },
+  { label: '商业财经', cls: 'business', items: ['lululemon道歉', '上海链家通报', '山姆中国换帅'] },
+  { label: '政务要闻', cls: '', items: ['国防部新发言人', '江苏省委常委'] },
+  { label: '教育评论', cls: '', items: ['办好人民满意的教育'] },
+];
+
+const tagCloud = document.getElementById('tag-cloud');
+categories.forEach(cat => {
+  cat.items.forEach(item => {
+    const span = document.createElement('span');
+    span.className = `tag-item ${cat.cls}`;
+    span.textContent = item;
+    tagCloud.appendChild(span);
+  });
+});
+</script>
+</body>
+</html>
